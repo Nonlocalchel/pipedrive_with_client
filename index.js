@@ -50,8 +50,7 @@ app.get('/test_post_deal',async (req, res)=>{
             pipedriveApi.setToken(req.session)
         }
 
-        const postRequstAction = pipedriveApi.addNewDeal
-        const postReqAnswer = await postRequstAction()
+        const postReqAnswer = await pipedriveApi.addNewDeal()
 
         res.render('outcome', {
 			status: postReqAnswer.status,
@@ -70,8 +69,20 @@ app.get('/test_post_deal-field',async (req, res)=>{
             pipedriveApi.setToken(req.session)
         }
 
-        const postRequstAction = pipedriveApi.addNewDealField
-        const postReqAnswer = await postRequstAction()
+        const fs = require('fs');
+        const fieldData = JSON.parse(fs.readFileSync('data/dealFields.json', 'utf8'));
+
+        const fields = await pipedriveApi.getAllDealFields(100)
+        for (const field of fields.data) {
+            if (field.name === fieldData.name) {
+                res.render('outcome', {
+                    status: "not_add",
+                    message: 'Поле уже существует'
+                });
+            }
+        }
+
+        const postReqAnswer = await pipedriveApi.addNewDealField(fieldData)
 
         res.render('outcome', {
 			status: postReqAnswer.status,
