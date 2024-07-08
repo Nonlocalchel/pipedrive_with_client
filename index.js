@@ -32,11 +32,10 @@ app.get('/', async (req, res) => {
         // now make API calls as required
         // client will automatically refresh the token when it expires and call the token update callback
         const currentUserData = await pipedriveApi.getUserData()
-        const testPostLink = `${ROOT_URL}/test_post`
 
         res.render('iframe', {
 			name: currentUserData.name,
-            test_url: testPostLink
+            root_url: ROOT_URL
 		});
     } else {
         const authUrl = pipedriveApiClient.buildAuthorizationUrl();;
@@ -45,13 +44,33 @@ app.get('/', async (req, res) => {
     }
 });
 
-app.get('/test_post',async (req, res)=>{
+app.get('/test_post_deal',async (req, res)=>{
     if (req.session.accessToken !== null && req.session.accessToken !== undefined) {
         if(!pipedriveApi.checkToken()){
             pipedriveApi.setToken(req.session)
         }
 
         const postRequstAction = pipedriveApi.addNewDeal
+        const postReqAnswer = await postRequstAction()
+
+        res.render('outcome', {
+			status: postReqAnswer.status,
+            message: postReqAnswer.message
+		});
+    } else {
+        const authUrl = pipedriveApiClient.buildAuthorizationUrl();;
+
+        res.redirect(authUrl);
+    }
+})
+
+app.get('/test_post_deal-field',async (req, res)=>{
+    if (req.session.accessToken !== null && req.session.accessToken !== undefined) {
+        if(!pipedriveApi.checkToken()){
+            pipedriveApi.setToken(req.session)
+        }
+
+        const postRequstAction = pipedriveApi.addNewDealField
         const postReqAnswer = await postRequstAction()
 
         res.render('outcome', {
