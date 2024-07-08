@@ -17,3 +17,4 @@ function fetchTestPostRequest(){
 }
 
 function test(){alert(1)}
+

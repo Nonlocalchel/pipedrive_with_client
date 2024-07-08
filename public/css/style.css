@@ -4,11 +4,11 @@
     animation: reveal 4s forwards;
 }
 
-.outcome-won {
+.outcome-add {
     background-color: green!important;
 }
 
-.outcome-lost {
+.outcome-not-add {
     background-color: red!important;
 }
 
