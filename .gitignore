@@ -1,0 +1,8 @@
+node_modules
+
+# System, IDE, misc
+.DS_Store
+.idea
+.vscode
+
+config.js
