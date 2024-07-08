@@ -7,6 +7,8 @@ const pipedriveApiClient = pipedriveApi.apiClient
 const cookieParser = require('cookie-parser');
 const cookieSession = require('cookie-session');
 
+const utils = require('./services/utils')
+
 const PORT = 3000;
 const ROOT_URL = `http://localhost:${PORT}`
 
@@ -32,7 +34,6 @@ app.get('/', async (req, res) => {
         // now make API calls as required
         // client will automatically refresh the token when it expires and call the token update callback
         const currentUserData = await pipedriveApi.getUserData()
-
         res.render('iframe', {
 			name: currentUserData.name,
             root_url: ROOT_URL
@@ -51,7 +52,6 @@ app.get('/test_post_deal',async (req, res)=>{
         }
 
         const postReqAnswer = await pipedriveApi.addNewDeal()
-
         res.render('outcome', {
 			status: postReqAnswer.status,
             message: postReqAnswer.message
@@ -69,21 +69,13 @@ app.get('/test_post_deal-field',async (req, res)=>{
             pipedriveApi.setToken(req.session)
         }
 
-        const fs = require('fs');
-        const fieldData = JSON.parse(fs.readFileSync('data/dealFields.json', 'utf8'));
-
+        const rowFieldData = utils.parseJson('./services/dealFields.json')
+        const customFieldsList = utils.getFieldsData(rowFieldData)
         const fields = await pipedriveApi.getAllDealFields(100)
-        for (const field of fields.data) {
-            if (field.name === fieldData.name) {
-                res.render('outcome', {
-                    status: "not_add",
-                    message: 'Поле уже существует'
-                });
-            }
-        }
 
-        const postReqAnswer = await pipedriveApi.addNewDealField(fieldData)
+        const fCustomFieldsList=utils.filterFieldsList(customFieldsList,fields.data)
 
+        const postReqAnswer = await pipedriveApi.addNewDealFields(fCustomFieldsList)
         res.render('outcome', {
 			status: postReqAnswer.status,
             message: postReqAnswer.message
